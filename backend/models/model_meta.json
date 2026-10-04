@@ -1,0 +1,159 @@
+{
+  "model_name": "Random Forest Regressor",
+  "selected_model": "Random Forest Regressor",
+  "seed": 42,
+  "raw_rows": 19239,
+  "cleaned_rows": 17107,
+  "train_rows": 13685,
+  "test_rows": 3422,
+  "cv_mae": {
+    "Linear Regression": 2.053,
+    "Random Forest Regressor": 0.9475,
+    "Gradient Boosting Regressor": 1.0208
+  },
+  "test_metrics": {
+    "mae": 0.9168,
+    "rmse": 1.1877,
+    "r2": 0.9693
+  },
+  "features": [
+    "pace",
+    "shooting",
+    "passing",
+    "dribbling",
+    "defending",
+    "physical",
+    "position"
+  ],
+  "numeric_features": [
+    "pace",
+    "shooting",
+    "passing",
+    "dribbling",
+    "defending",
+    "physical"
+  ],
+  "positions": [
+    "CAM",
+    "CB",
+    "CDM",
+    "CF",
+    "CM",
+    "LB",
+    "LM",
+    "LW",
+    "RB",
+    "RM",
+    "RW",
+    "ST"
+  ],
+  "model_file_size_bytes": 12276665,
+  "model_file_size_mb": 11.71,
+  "global_feature_importance": {
+    "pace": 0.0267,
+    "shooting": 0.1399,
+    "passing": 0.0778,
+    "dribbling": 0.2856,
+    "defending": 0.4185,
+    "physical": 0.0514
+  },
+  "position_feature_importance": {
+    "CAM": {
+      "pace": 0.011,
+      "shooting": 0.2399,
+      "passing": 0.1683,
+      "dribbling": 0.5244,
+      "defending": 0.0362,
+      "physical": 0.0202
+    },
+    "CB": {
+      "pace": 0.0027,
+      "shooting": 0.0032,
+      "passing": 0.0242,
+      "dribbling": 0.0475,
+      "defending": 0.831,
+      "physical": 0.0913
+    },
+    "CDM": {
+      "pace": 0.0023,
+      "shooting": 0.0329,
+      "passing": 0.0837,
+      "dribbling": 0.2043,
+      "defending": 0.6254,
+      "physical": 0.0515
+    },
+    "CF": {
+      "pace": 0.0255,
+      "shooting": 0.2744,
+      "passing": 0.147,
+      "dribbling": 0.5123,
+      "defending": 0.0031,
+      "physical": 0.0376
+    },
+    "CM": {
+      "pace": 0.0026,
+      "shooting": 0.1668,
+      "passing": 0.1319,
+      "dribbling": 0.3954,
+      "defending": 0.273,
+      "physical": 0.0302
+    },
+    "LB": {
+      "pace": 0.0626,
+      "shooting": 0.0268,
+      "passing": 0.0785,
+      "dribbling": 0.2527,
+      "defending": 0.5552,
+      "physical": 0.0243
+    },
+    "LM": {
+      "pace": 0.0429,
+      "shooting": 0.1984,
+      "passing": 0.1905,
+      "dribbling": 0.5091,
+      "defending": 0.0243,
+      "physical": 0.0347
+    },
+    "LW": {
+      "pace": 0.0657,
+      "shooting": 0.2186,
+      "passing": 0.1896,
+      "dribbling": 0.4934,
+      "defending": 0.0054,
+      "physical": 0.0273
+    },
+    "RB": {
+      "pace": 0.0658,
+      "shooting": 0.0164,
+      "passing": 0.0704,
+      "dribbling": 0.235,
+      "defending": 0.5801,
+      "physical": 0.0322
+    },
+    "RM": {
+      "pace": 0.0532,
+      "shooting": 0.2021,
+      "passing": 0.1856,
+      "dribbling": 0.4831,
+      "defending": 0.0349,
+      "physical": 0.0412
+    },
+    "RW": {
+      "pace": 0.052,
+      "shooting": 0.2234,
+      "passing": 0.1688,
+      "dribbling": 0.5268,
+      "defending": 0.0092,
+      "physical": 0.02
+    },
+    "ST": {
+      "pace": 0.0106,
+      "shooting": 0.539,
+      "passing": 0.0283,
+      "dribbling": 0.3115,
+      "defending": 0.0073,
+      "physical": 0.1033
+    }
+  },
+  "training_timestamp": "2026-10-04 16:00:02 UTC"
+}
