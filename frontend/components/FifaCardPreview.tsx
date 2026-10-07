@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
 import { PlayerProfile, POSITION_CATEGORIES, STAT_DEFINITIONS } from '@/types/player';
 import { Shield, Sparkles, Star, User } from 'lucide-react';
 import { getStatColor } from './StatSlider';
@@ -65,18 +66,41 @@ export default function FifaCardPreview({
   };
 
   const theme = getCardThemeClasses();
+  const revealState = isAnalyzing ? 'analyzing' : rating === null ? 'pending' : 'revealed';
 
   return (
-    <div className="flex flex-col items-center">
+    <AnimatePresence mode="wait">
+      <motion.div
+        key={revealState}
+        initial={
+          revealState === 'revealed'
+            ? { opacity: 0, rotateY: -90, y: 18, scale: 0.92 }
+            : { opacity: 1 }
+        }
+        animate={{ opacity: 1, rotateY: 0, y: 0, scale: 1 }}
+        exit={{ opacity: 0, rotateY: 90, y: -12, scale: 0.94 }}
+        transition={{ duration: revealState === 'revealed' ? 0.75 : 0.25, ease: 'easeOut' }}
+        className="flex flex-col items-center [perspective:1200px]"
+      >
       {/* FUT Card Container */}
       <div
-        className={`relative w-[310px] sm:w-[330px] rounded-3xl p-5 border-2 bg-gradient-to-b ${theme.cardBg} ${theme.cardBorder} transition-all duration-300`}
+        className={`relative w-[310px] sm:w-[330px] rounded-3xl p-5 border-2 bg-gradient-to-b ${theme.cardBg} ${theme.cardBorder} transition-all duration-300 ${
+          revealState === 'revealed' ? 'shadow-[0_0_45px_rgba(0,255,135,0.35)]' : ''
+        }`}
         style={{
           clipPath: 'polygon(0 0, 100% 0, 100% calc(100% - 24px), calc(100% - 24px) 100%, 24px 100%, 0 calc(100% - 24px))',
         }}
       >
         {/* Holographic light sheen overlay */}
         <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/[0.04] to-transparent pointer-events-none rounded-3xl" />
+        {revealState === 'revealed' && (
+          <motion.div
+            initial={{ x: '-120%', opacity: 0 }}
+            animate={{ x: '120%', opacity: [0, 0.8, 0] }}
+            transition={{ duration: 1.1, delay: 0.25, ease: 'easeInOut' }}
+            className="absolute inset-y-0 w-1/3 bg-gradient-to-r from-transparent via-white/30 to-transparent skew-x-[-18deg] pointer-events-none"
+          />
+        )}
 
         {/* Top Header: Rating, Position, Club/Nation icons */}
         <div className="flex items-start justify-between relative z-10">
@@ -86,7 +110,7 @@ export default function FifaCardPreview({
               {isAnalyzing ? '…' : rating ?? '—'}
             </span>
             <span className="text-[9px] font-mono uppercase tracking-wider text-slate-500 mt-1">
-              {isAnalyzing ? 'Analyzing' : rating === null ? 'Awaiting ML' : 'ML OVR'}
+              {isAnalyzing ? 'Analysing' : rating === null ? 'Awaiting ML' : 'ML Prediction'}
             </span>
             <span className="text-base font-black tracking-wider uppercase text-slate-100 font-mono mt-0.5">
               {player.position}
@@ -214,7 +238,7 @@ export default function FifaCardPreview({
             Live Scouting Metrics
           </span>
           <span className="text-[#00ff87] text-[11px]">
-            {isAnalyzing ? 'Analyzing…' : rating === null ? 'Awaiting analysis' : 'ML Prediction'}
+            {isAnalyzing ? 'ANALYSING…' : rating === null ? 'Awaiting analysis' : 'ML Prediction'}
           </span>
         </div>
 
@@ -243,6 +267,7 @@ export default function FifaCardPreview({
             : '* Final OVR supplied by the FastAPI prediction model.'}
         </div>
       </div>
-    </div>
+      </motion.div>
+    </AnimatePresence>
   );
 }

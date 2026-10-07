@@ -89,6 +89,11 @@ export default function PlayerBuilder() {
   const predictionRequestId = useRef(0);
 
   const isGk = POSITION_CATEGORIES[player.position] === 'GK';
+  const revealPhase = isAnalyzing
+    ? 'ANALYSE'
+    : predictedOverall !== null
+      ? 'REVEAL'
+      : 'BUILD';
 
   // Handle stat change
   const handleStatChange = (key: StatKey, value: number) => {
@@ -626,7 +631,7 @@ export default function PlayerBuilder() {
               ) : (
                 <Zap className="w-4 h-4 fill-slate-950" />
               )}
-              {isAnalyzing ? 'Analyzing Player…' : 'Verify & Analyze Player'}
+              {isAnalyzing ? 'ANALYSING PLAYER…' : 'Verify & Analyze Player'}
             </button>
           </div>
         </div>
@@ -639,8 +644,12 @@ export default function PlayerBuilder() {
                 <span className="w-2 h-2 rounded-full bg-[#00ff87] animate-pulse" />
                 Live Card Canvas
               </span>
-              <span className="text-[10px] font-mono text-slate-500 uppercase">
-                Real-Time Reactive
+              <span
+                className={`text-[10px] font-mono uppercase ${
+                  revealPhase === 'REVEAL' ? 'text-[#00ff87]' : 'text-slate-500'
+                }`}
+              >
+                {revealPhase} • {revealPhase === 'BUILD' ? 'Configure' : revealPhase === 'ANALYSE' ? 'ML Processing' : 'ML Prediction'}
               </span>
             </div>
 
