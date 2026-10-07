@@ -7,9 +7,15 @@ import { getStatColor } from './StatSlider';
 
 interface FifaCardPreviewProps {
   player: PlayerProfile;
+  overall: number | null;
+  isAnalyzing: boolean;
 }
 
-export default function FifaCardPreview({ player }: FifaCardPreviewProps) {
+export default function FifaCardPreview({
+  player,
+  overall,
+  isAnalyzing,
+}: FifaCardPreviewProps) {
   const isGk = POSITION_CATEGORIES[player.position] === 'GK';
 
   // Calculate quick average of the 6 stats for the preview draft rating
@@ -18,34 +24,11 @@ export default function FifaCardPreview({ player }: FifaCardPreviewProps) {
     statValues.reduce((sum, val) => sum + val, 0) / statValues.length
   );
 
-  // Position-weighted draft preview rating (just for UI preview prior to ML model in Milestone 3)
-  const calculateDraftRating = (): number => {
-    const s = player.stats;
-    if (isGk) {
-      return Math.round(
-        s.dribbling * 0.25 + // REF
-        s.pace * 0.25 +      // DIV
-        s.shooting * 0.20 +  // HAN
-        s.physical * 0.15 +  // POS
-        s.passing * 0.15     // KIC
-      );
-    }
-    const cat = POSITION_CATEGORIES[player.position];
-    if (cat === 'ATT') {
-      return Math.round(s.shooting * 0.35 + s.pace * 0.25 + s.dribbling * 0.20 + s.passing * 0.10 + s.physical * 0.10);
-    }
-    if (cat === 'MID') {
-      return Math.round(s.passing * 0.30 + s.dribbling * 0.25 + s.pace * 0.15 + s.shooting * 0.15 + s.physical * 0.15);
-    }
-    // DEF
-    return Math.round(s.defending * 0.40 + s.physical * 0.30 + s.pace * 0.15 + s.passing * 0.15);
-  };
-
-  const draftRating = Math.min(99, Math.max(45, calculateDraftRating()));
+  const rating = overall;
 
   // Card theme styling
   const getCardThemeClasses = () => {
-    if (draftRating >= 90) {
+    if (rating !== null && rating >= 90) {
       return {
         cardBorder: 'border-[#00ff87]/80 shadow-[0_0_35px_rgba(0,255,135,0.4)]',
         accentGradient: 'from-emerald-400 via-[#00ff87] to-teal-400',
@@ -54,7 +37,7 @@ export default function FifaCardPreview({ player }: FifaCardPreviewProps) {
         textGlow: 'text-[#00ff87]',
       };
     }
-    if (draftRating >= 84) {
+    if (rating !== null && rating >= 84) {
       return {
         cardBorder: 'border-yellow-400/80 shadow-[0_0_30px_rgba(250,204,21,0.35)]',
         accentGradient: 'from-amber-300 via-yellow-400 to-amber-500',
@@ -63,7 +46,7 @@ export default function FifaCardPreview({ player }: FifaCardPreviewProps) {
         textGlow: 'text-yellow-400',
       };
     }
-    if (draftRating >= 75) {
+    if (rating !== null && rating >= 75) {
       return {
         cardBorder: 'border-slate-500/70 shadow-[0_0_20px_rgba(148,163,184,0.2)]',
         accentGradient: 'from-slate-300 via-slate-100 to-slate-400',
@@ -98,9 +81,12 @@ export default function FifaCardPreview({ player }: FifaCardPreviewProps) {
         {/* Top Header: Rating, Position, Club/Nation icons */}
         <div className="flex items-start justify-between relative z-10">
           <div className="flex flex-col items-center">
-            {/* Draft / Estimated Rating Badge */}
+            {/* Backend ML Rating Badge */}
             <span className={`text-4xl font-black tracking-tighter leading-none ${theme.textGlow}`}>
-              {draftRating}
+              {isAnalyzing ? '…' : rating ?? '—'}
+            </span>
+            <span className="text-[9px] font-mono uppercase tracking-wider text-slate-500 mt-1">
+              {isAnalyzing ? 'Analyzing' : rating === null ? 'Awaiting ML' : 'ML OVR'}
             </span>
             <span className="text-base font-black tracking-wider uppercase text-slate-100 font-mono mt-0.5">
               {player.position}
@@ -227,7 +213,9 @@ export default function FifaCardPreview({ player }: FifaCardPreviewProps) {
             <Sparkles className="w-3.5 h-3.5 text-[#00ff87]" />
             Live Scouting Metrics
           </span>
-          <span className="text-[#00ff87] text-[11px]">Preview Draft</span>
+          <span className="text-[#00ff87] text-[11px]">
+            {isAnalyzing ? 'Analyzing…' : rating === null ? 'Awaiting analysis' : 'ML Prediction'}
+          </span>
         </div>
 
         <div className="flex justify-between items-center text-[11px]">
@@ -250,7 +238,9 @@ export default function FifaCardPreview({ player }: FifaCardPreviewProps) {
         </div>
 
         <div className="pt-1 text-[10px] text-slate-500 italic text-center">
-          * Final ML Rating will be predicted by FastAPI in Milestone 3
+          {rating === null
+            ? '* Verify the player to calculate the final ML OVR.'
+            : '* Final OVR supplied by the FastAPI prediction model.'}
         </div>
       </div>
     </div>

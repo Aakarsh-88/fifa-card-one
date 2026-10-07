@@ -1,3 +1,5 @@
+import { PlayerStats, Position } from '@/types/player';
+
 export const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
@@ -6,6 +8,55 @@ export interface HealthCheckResponse {
   service?: string;
   version?: string;
   timestamp?: string;
+}
+
+export interface PredictResponse {
+  overall: number;
+  feature_importance: Record<string, number>;
+  model: string;
+}
+
+export async function predictPlayerRating(
+  stats: PlayerStats,
+  position: Position,
+  signal?: AbortSignal
+): Promise<PredictResponse> {
+  const response = await fetch(`${API_BASE_URL}/predict`, {
+    method: 'POST',
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      ...stats,
+      position,
+    }),
+    signal,
+    cache: 'no-store',
+  });
+
+  const data: PredictResponse | { detail?: string | Array<{ msg?: string }> } =
+    await response.json().catch(() => ({}));
+
+  if (!response.ok) {
+    const detail = 'detail' in data ? data.detail : undefined;
+    const message = Array.isArray(detail)
+      ? detail.map((item) => item.msg).filter(Boolean).join(', ')
+      : detail;
+    throw new Error(message || `Prediction failed (HTTP ${response.status})`);
+  }
+
+  if (
+    !('overall' in data) ||
+    typeof data.overall !== 'number' ||
+    !Number.isInteger(data.overall) ||
+    data.overall < 1 ||
+    data.overall > 99
+  ) {
+    throw new Error('The prediction API returned an invalid overall rating.');
+  }
+
+  return data as PredictResponse;
 }
 
 export async function checkBackendHealth(): Promise<{

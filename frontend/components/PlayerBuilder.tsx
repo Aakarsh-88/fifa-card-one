@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import {
   PlayerProfile,
   PlayerStats,
@@ -16,6 +16,7 @@ import StatSlider from './StatSlider';
 import PositionSelector from './PositionSelector';
 import ArchetypeSelector from './ArchetypeSelector';
 import FifaCardPreview from './FifaCardPreview';
+import { predictPlayerRating } from '@/lib/api';
 import {
   RotateCcw,
   Dice5,
@@ -82,11 +83,19 @@ export default function PlayerBuilder() {
   const [activeArchetype, setActiveArchetype] = useState<string | undefined>('clinical-striker');
   const [activeTab, setActiveTab] = useState<'attributes' | 'profile' | 'presets'>('attributes');
   const [validationSuccess, setValidationSuccess] = useState<string | null>(null);
+  const [predictionError, setPredictionError] = useState<string | null>(null);
+  const [predictedOverall, setPredictedOverall] = useState<number | null>(null);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const predictionRequestId = useRef(0);
 
   const isGk = POSITION_CATEGORIES[player.position] === 'GK';
 
   // Handle stat change
   const handleStatChange = (key: StatKey, value: number) => {
+    predictionRequestId.current += 1;
+    setPredictedOverall(null);
+    setPredictionError(null);
+    setIsAnalyzing(false);
     setPlayer((prev) => ({
       ...prev,
       stats: {
@@ -99,6 +108,10 @@ export default function PlayerBuilder() {
 
   // Handle position change
   const handlePositionChange = (newPos: Position) => {
+    predictionRequestId.current += 1;
+    setPredictedOverall(null);
+    setPredictionError(null);
+    setIsAnalyzing(false);
     setPlayer((prev) => ({
       ...prev,
       position: newPos,
@@ -107,6 +120,10 @@ export default function PlayerBuilder() {
 
   // Handle archetype selection
   const handleSelectArchetype = (archetype: PlayerArchetype) => {
+    predictionRequestId.current += 1;
+    setPredictedOverall(null);
+    setPredictionError(null);
+    setIsAnalyzing(false);
     setPlayer((prev) => ({
       ...prev,
       position: archetype.position,
@@ -117,6 +134,10 @@ export default function PlayerBuilder() {
 
   // Randomize stats
   const handleRandomizeStats = () => {
+    predictionRequestId.current += 1;
+    setPredictedOverall(null);
+    setPredictionError(null);
+    setIsAnalyzing(false);
     const randomStat = () => Math.floor(Math.random() * (96 - 55 + 1)) + 55;
     setPlayer((prev) => ({
       ...prev,
@@ -134,9 +155,13 @@ export default function PlayerBuilder() {
 
   // Reset to default
   const handleReset = () => {
+    predictionRequestId.current += 1;
     setPlayer(INITIAL_PLAYER);
     setActiveArchetype('clinical-striker');
     setValidationSuccess(null);
+    setPredictionError(null);
+    setPredictedOverall(null);
+    setIsAnalyzing(false);
   };
 
   // Validate inputs
@@ -150,16 +175,43 @@ export default function PlayerBuilder() {
         return { valid: false, message: 'All stats must be between 1 and 99.' };
       }
     }
-    return { valid: true, message: 'Player data verified successfully! Ready for Milestone 3 prediction.' };
+    if (isGk) {
+      return { valid: false, message: 'Goalkeepers are not supported by the ML prediction model.' };
+    }
+    return { valid: true, message: 'Player data verified successfully.' };
   };
 
-  const handleValidateClick = () => {
+  const handleValidateClick = async () => {
     const result = validateForm();
-    if (result.valid) {
-      setValidationSuccess(result.message);
-      setTimeout(() => setValidationSuccess(null), 5000);
-    } else {
-      alert(result.message);
+    setValidationSuccess(null);
+    setPredictionError(null);
+
+    if (!result.valid) {
+      setPredictionError(result.message);
+      return;
+    }
+
+    const requestId = ++predictionRequestId.current;
+    setIsAnalyzing(true);
+
+    try {
+      const prediction = await predictPlayerRating(player.stats, player.position);
+      if (requestId !== predictionRequestId.current) {
+        return;
+      }
+      setPredictedOverall(prediction.overall);
+      setValidationSuccess('Player analyzed successfully. ML OVR is now live on the card.');
+    } catch (error: unknown) {
+      if (requestId !== predictionRequestId.current) {
+        return;
+      }
+      setPredictionError(
+        error instanceof Error ? error.message : 'Unable to analyze this player.'
+      );
+    } finally {
+      if (requestId === predictionRequestId.current) {
+        setIsAnalyzing(false);
+      }
     }
   };
 
@@ -553,13 +605,28 @@ export default function PlayerBuilder() {
               </div>
             )}
 
+            {predictionError && (
+              <div
+                role="alert"
+                className="p-2.5 rounded-lg bg-rose-500/10 border border-rose-500/40 text-xs font-mono text-rose-300 flex items-center gap-2"
+              >
+                <AlertCircle className="w-4 h-4 shrink-0" />
+                {predictionError}
+              </div>
+            )}
+
             <button
               type="button"
               onClick={handleValidateClick}
+              disabled={isAnalyzing}
               className="w-full py-3 px-4 rounded-xl font-black text-sm tracking-wider uppercase bg-[#00ff87] hover:bg-[#00ff87]/90 text-slate-950 shadow-[0_0_20px_rgba(0,255,135,0.4)] transition-all flex items-center justify-center gap-2"
             >
-              <Zap className="w-4 h-4 fill-slate-950" />
-              Verify & Prepare Player Data
+              {isAnalyzing ? (
+                <Sparkles className="w-4 h-4 animate-spin" />
+              ) : (
+                <Zap className="w-4 h-4 fill-slate-950" />
+              )}
+              {isAnalyzing ? 'Analyzing Player…' : 'Verify & Analyze Player'}
             </button>
           </div>
         </div>
@@ -577,7 +644,11 @@ export default function PlayerBuilder() {
               </span>
             </div>
 
-            <FifaCardPreview player={player} />
+            <FifaCardPreview
+              player={player}
+              overall={predictedOverall}
+              isAnalyzing={isAnalyzing}
+            />
           </div>
         </div>
       </div>
