@@ -78,8 +78,10 @@ export interface PlayerProfile {
   name: string;
   position: Position;
   nation: string;
+  nationCode?: string;
+  nationFlag?: string;
   club: string;
-  league: string;
+  league?: string;
   age: number;
   height: number; // in cm
   weight: number; // in kg
@@ -91,6 +93,9 @@ export interface PlayerProfile {
   stats: PlayerStats;
   avatarUrl?: string;
   cardTheme?: 'fut-gold' | 'cyber-lime' | 'totw' | 'icon';
+  scoutRating?: number;
+  featureImportance?: Record<string, number>;
+  scoutModel?: string;
 }
 
 export interface PlayerArchetype {

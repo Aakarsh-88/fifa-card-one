@@ -44,7 +44,7 @@ export default function StatusPill() {
       </div>
 
       <div className="flex items-center gap-1.5 text-slate-300">
-        <span className="text-[11px] font-medium text-slate-400">API:</span>
+        <span className="text-[11px] font-medium text-slate-400">Scout Network:</span>
         <span
           className={`font-semibold capitalize ${
             status === 'online'
@@ -64,9 +64,9 @@ export default function StatusPill() {
       <button
         onClick={performCheck}
         disabled={isRefreshing}
-        title={`Click to recheck health (Last: ${lastChecked ? lastChecked.toLocaleTimeString() : 'never'})`}
+        title={`Click to recheck scouting network (Last: ${lastChecked ? lastChecked.toLocaleTimeString() : 'never'})`}
         className="text-slate-500 hover:text-slate-300 transition-colors p-0.5 rounded focus:outline-none"
-        aria-label="Refresh API Status"
+        aria-label="Refresh Scout Status"
       >
         <RefreshCw className={`w-3 h-3 ${isRefreshing ? 'animate-spin text-slate-300' : ''}`} />
       </button>

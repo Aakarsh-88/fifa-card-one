@@ -110,7 +110,7 @@ export default function ArchetypeSelector({ onSelect, activeId }: ArchetypeSelec
           <Sparkles className="w-3.5 h-3.5 text-[#00ff87]" />
           Quick Archetype Presets
         </span>
-        <span className="text-[11px] text-slate-500">Click to apply baseline stats</span>
+        <span className="text-[11px] text-slate-500">Choose a football style</span>
       </div>
 
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">

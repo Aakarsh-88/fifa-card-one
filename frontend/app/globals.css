@@ -91,12 +91,99 @@ input[type="range"]::-moz-range-thumb {
   transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
-/* Futuristic background grid */
-.bg-scout-grid {
-  background-size: 40px 40px;
+/* Stadium Floodlights & Pitch Markings */
+.stadium-light-left {
+  background: radial-gradient(ellipse 65% 55% at 0% 0%, rgba(0, 255, 135, 0.12) 0%, rgba(250, 204, 21, 0.05) 35%, transparent 70%);
+}
+
+.stadium-light-right {
+  background: radial-gradient(ellipse 65% 55% at 100% 0%, rgba(250, 204, 21, 0.10) 0%, rgba(0, 255, 135, 0.06) 35%, transparent 70%);
+}
+
+.pitch-grid {
+  background-size: 48px 48px;
   background-image: 
-    linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+    linear-gradient(to right, rgba(255, 255, 255, 0.025) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
+}
+
+/* Premium EA FC Gold Card Styles */
+.fut-gold-card {
+  background: linear-gradient(145deg, #fceda6 0%, #e6cb7a 22%, #c9a44c 48%, #dfc374 72%, #a8802d 100%);
+  box-shadow:
+    0 15px 35px -5px rgba(0, 0, 0, 0.75),
+    0 0 25px -2px rgba(223, 195, 116, 0.35),
+    inset 0 1px 2px rgba(255, 255, 255, 0.6),
+    inset 0 -2px 4px rgba(78, 55, 12, 0.5);
+}
+
+.fut-gold-card-border {
+  border: 2px solid;
+  border-image-slice: 1;
+  border-image-source: linear-gradient(to bottom, #ffe89e, #b88628 50%, #684814);
+}
+
+.fut-card-shield {
+  clip-path: polygon(
+    0% 0%,
+    100% 0%,
+    100% calc(100% - 30px),
+    50% 100%,
+    0% calc(100% - 30px)
+  );
+}
+
+/* Subtle Shimmer & Spin Animations */
+@keyframes ball-spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes ball-float {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-8px) rotate(6deg);
+  }
+}
+
+@keyframes gold-shine {
+  0% {
+    transform: translateX(-120%) skewX(-20deg);
+  }
+  25%, 100% {
+    transform: translateX(220%) skewX(-20deg);
+  }
+}
+
+.animate-ball-spin {
+  animation: ball-spin 18s linear infinite;
+}
+
+.animate-ball-float {
+  animation: ball-float 5s ease-in-out infinite;
+}
+
+.animate-gold-shine {
+  animation: gold-shine 6s ease-in-out infinite;
+}
+
+/* Respect Reduced Motion Preferences */
+@media (prefers-reduced-motion: reduce) {
+  .animate-ball-spin,
+  .animate-ball-float,
+  .animate-gold-shine,
+  .animate-bounce,
+  .animate-pulse,
+  .animate-ping {
+    animation: none !important;
+    transition: none !important;
+  }
 }
 
 /* Custom Scrollbars */

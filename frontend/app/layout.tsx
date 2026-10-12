@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "FIFA Card Generator | Player Rating Laboratory",
-  description: "Advanced AI Football Scouting & Ultimate Team Player Rating Laboratory",
+  title: "FIFA Card One | Create Your Player",
+  description: "Craft your ultimate football card with official EA FC gold styling and official scout ratings.",
 };
 
 export default function RootLayout({
